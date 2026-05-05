@@ -24,12 +24,24 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     var header = document.getElementById('header');
+    var bannerVeil = document.getElementById('bannerVeil');
+
     window.addEventListener('scroll', function () {
-        if (window.scrollY > 50) {
+        var scrollY = window.scrollY;
+        var vh = window.innerHeight;
+
+        // Header scroll style
+        if (scrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
+
+        // Dégradé montant par le bas : translateY(60%) au repos → translateY(0%) au scroll
+        var progress = Math.min(scrollY / (vh * 0.4), 1);
+        var eased = 1 - Math.pow(1 - progress, 2);
+        var translateY = 60 - (eased * 60);
+        bannerVeil.style.transform = 'translateY(' + translateY.toFixed(1) + '%)';
     });
 
     var faqItems = document.querySelectorAll('.faq-item');

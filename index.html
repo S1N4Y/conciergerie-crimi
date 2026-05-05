@@ -7,8 +7,523 @@
     <meta name="description" content="Conciergerie Mesange, votre partenaire de confiance pour la gestion locative Airbnb a Angers et ses environs.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet">
+    <style>
+/* ===================== RESET & BASE ===================== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --primary: #2F5D73;
+    --accent: #F2C94C;
+    --bg-light: #F7F7F7;
+    --border: #E5E5E5;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    color: var(--primary);
+    background-color: var(--bg-light);
+    line-height: 1.7;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+a { text-decoration: none; color: var(--primary); }
+ul { list-style: none; }
+img { max-width: 100%; display: block; }
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* ===================== HEADER ===================== */
+.header {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 32px;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.header.scrolled {
+    padding: 8px 32px;
+    background: rgba(247, 247, 247, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 20px rgba(47, 93, 115, 0.08);
+}
+
+.header-logo { margin-left: auto; }
+.header-logo img { height: 50px; mix-blend-mode: multiply; }
+
+/* BURGER */
+.burger {
+    width: 32px; height: 24px;
+    background: none; border: none;
+    cursor: pointer;
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 0; z-index: 200;
+}
+
+.burger span {
+    display: block; width: 100%; height: 2px;
+    background: var(--primary); border-radius: 2px;
+    transition: all 0.35s ease; transform-origin: center;
+}
+
+.burger.active span:nth-child(1) { transform: translateY(11px) rotate(45deg); }
+.burger.active span:nth-child(2) { opacity: 0; }
+.burger.active span:nth-child(3) { transform: translateY(-11px) rotate(-45deg); }
+
+/* DROPDOWN */
+.menu-dropdown {
+    position: fixed;
+    top: 56px; left: 32px;
+    z-index: 150;
+    background: var(--bg-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(47, 93, 115, 0.12);
+    padding: 16px 0;
+    min-width: 220px;
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.menu-dropdown.open { opacity: 1; transform: translateY(0); pointer-events: all; }
+
+.menu-nav { display: flex; flex-direction: column; }
+
+.menu-nav a {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200; font-size: 0.95rem;
+    color: var(--primary); padding: 12px 28px;
+    transition: all 0.2s ease;
+}
+
+.menu-nav a:hover { background: rgba(242, 201, 76, 0.15); }
+
+/* ===================== BANNER ===================== */
+/* Hero fixé : reste en arrière-plan ; les sections suivantes scrollent par-dessus */
+.banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.banner img {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    z-index: 0;
+}
+
+/* Espace de scroll qui pilote l'animation du voile (hero reste fixé pendant ce temps) */
+.banner-spacer {
+    height: 100vh;
+    position: relative;
+    z-index: 0;
+}
+
+/* Voile : solide, dégradé long et progressif, monte pour couvrir 100% de l'image */
+.banner-veil {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 150%;
+    background: var(--bg-light);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 12%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,0.7) 38%, rgba(0,0,0,0.92) 50%, black 60%, black 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 12%, rgba(0,0,0,0.4) 25%, rgba(0,0,0,0.7) 38%, rgba(0,0,0,0.92) 50%, black 60%, black 100%);
+    transform: translateY(20%);
+    z-index: 1;
+    pointer-events: none;
+    will-change: transform;
+}
+
+.banner-content {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+    z-index: 2;
+    padding: 0 24px;
+    will-change: transform, opacity, filter;
+}
+
+/* === ENTRÉE HERO (au chargement) === */
+@keyframes heroFadeUp {
+    from { opacity: 0; transform: translateY(40px); filter: blur(10px); }
+    to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+@keyframes heroFadeUpSub {
+    from { opacity: 0; transform: translateY(20px); letter-spacing: -0.5px; }
+    to   { opacity: 1; transform: translateY(0);    letter-spacing: 0.5px; }
+}
+
+.banner-content h1 {
+    font-size: 2.6rem;
+    font-weight: 500;
+    color: var(--primary);
+    margin-bottom: 12px;
+    font-style: italic;
+    text-shadow: 0 1px 20px rgba(247, 247, 247, 0.9);
+    opacity: 0;
+    animation: heroFadeUp 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s forwards;
+}
+
+.banner-content .hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--primary);
+    text-shadow: 0 1px 15px rgba(247, 247, 247, 0.9);
+    opacity: 0;
+    animation: heroFadeUpSub 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 1.1s forwards;
+}
+
+/* ===================== SERVICES ===================== */
+.services {
+    position: relative;
+    z-index: 5;
+    padding: 80px 0;
+    background: var(--bg-light);
+}
+
+.services h2 { text-align: center; font-size: 2.2rem; margin-bottom: 12px; }
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.05rem;
+    margin-bottom: 50px;
+    color: var(--primary);
+    opacity: 0.8;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+}
+
+.service-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px 24px;
+    transition: all 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(47, 93, 115, 0.1);
+    border-color: var(--accent);
+}
+
+.service-icon {
+    width: 56px; height: 56px;
+    background: rgba(242, 201, 76, 0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 20px;
+    color: var(--primary);
+}
+
+.service-card h3 { font-size: 1.1rem; margin-bottom: 14px; }
+
+.service-card ul { display: flex; flex-direction: column; gap: 8px; }
+
+.service-card li {
+    font-size: 0.9rem;
+    padding-left: 18px;
+    position: relative;
+}
+
+.service-card li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 9px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+}
+
+/* ===================== SHOWCASE ===================== */
+.showcase {
+    position: relative;
+    z-index: 3;
+    width: 100%; height: 50vh; min-height: 350px;
+    overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+}
+
+.showcase-image { position: absolute; inset: 0; }
+.showcase-image img { width: 100%; height: 100%; object-fit: cover; }
+.showcase-overlay { position: absolute; inset: 0; background: rgba(47, 93, 115, 0.55); }
+
+.showcase-content { position: relative; z-index: 2; text-align: center; padding: 0 24px; }
+
+.showcase-content h2 {
+    color: var(--bg-light);
+    font-size: 2.2rem;
+    font-style: italic;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* ===================== ABOUT ===================== */
+.about {
+    position: relative;
+    z-index: 3;
+    padding: 100px 0;
+    background: var(--bg-light);
+}
+
+.about h2 { text-align: center; font-size: 2.2rem; margin-bottom: 50px; }
+
+.about-content { display: flex; flex-direction: column; gap: 60px; }
+
+.about-text { max-width: 800px; margin: 0 auto; }
+
+.about-text p { margin-bottom: 20px; font-size: 1.02rem; text-align: center; }
+
+.about-values { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+.about-photo {
+    margin-top: 20px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.25);
+    position: relative;
+    aspect-ratio: 16 / 9;
+    max-height: 520px;
+}
+.about-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 1.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.about-photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 60%, rgba(47, 93, 115, 0.15) 100%);
+    pointer-events: none;
+}
+.about-photo:hover img { transform: scale(1.04); }
+
+.value-item { text-align: center; padding: 32px 20px; }
+
+.value-icon {
+    width: 60px; height: 60px;
+    background: rgba(242, 201, 76, 0.15);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    color: var(--primary);
+}
+
+.value-item h4 { font-size: 1.15rem; margin-bottom: 8px; }
+.value-item p { font-size: 0.92rem; opacity: 0.85; }
+
+/* ===================== CONTACT ===================== */
+.contact {
+    position: relative;
+    z-index: 3;
+    padding: 100px 0;
+    background: var(--border);
+}
+
+.contact h2 { text-align: center; font-size: 2.2rem; margin-bottom: 12px; }
+.contact .section-subtitle { margin-bottom: 50px; }
+
+.contact-info-centered {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 24px;
+    padding-top: 10px;
+}
+
+.contact-info-item { display: flex; align-items: center; gap: 16px; font-size: 1rem; }
+.contact-info-item svg { flex-shrink: 0; color: var(--primary); }
+
+/* ===================== FAQ ===================== */
+.faq { position: relative; z-index: 3; padding: 100px 0; background: var(--bg-light); }
+.faq h2 { text-align: center; font-size: 2.2rem; margin-bottom: 50px; }
+
+.faq-list { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+
+.faq-item { border: 2px solid var(--border); border-radius: 8px; overflow: hidden; transition: border-color 0.3s ease; }
+.faq-item:hover { border-color: var(--accent); }
+
+.faq-question {
+    width: 100%; background: none; border: none;
+    display: flex; align-items: center; justify-content: space-between;    padding: 20px 24px; cursor: pointer;
+    font-family: 'Raleway', sans-serif;
+    font-weight: 600; font-size: 1rem;
+    color: var(--primary); text-align: left;
+}
+
+.faq-question svg { flex-shrink: 0; transition: transform 0.3s ease; color: var(--primary); }
+.faq-item.active .faq-question svg { transform: rotate(180deg); }
+
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+.faq-item.active .faq-answer { max-height: 300px; }
+
+.faq-answer p { padding: 0 24px 20px; font-size: 0.95rem; opacity: 0.85; line-height: 1.8; }
+
+/* ===================== FOOTER ===================== */
+.footer { position: relative; z-index: 3; background: var(--primary); color: var(--bg-light); padding: 60px 0 30px; }
+.footer h4 { font-size: 1rem; margin-bottom: 16px; color: var(--accent); }
+.footer p, .footer a { color: var(--bg-light); font-size: 0.92rem; opacity: 0.85; }
+.footer a:hover { opacity: 1; color: var(--accent); }
+
+.footer-top {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(247, 247, 247, 0.15);
+}
+
+.footer-logo { height: 60px; margin-bottom: 16px; mix-blend-mode: multiply; }
+.footer-links { display: flex; flex-direction: column; gap: 10px; }
+.footer-contact { display: flex; flex-direction: column; gap: 10px; }
+.footer-bottom { text-align: center; padding-top: 24px; }
+.footer-bottom p { font-size: 0.85rem; opacity: 0.6; }
+
+/* ===================== ANIMATIONS ===================== */
+.fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* Hero exit au scroll (géré par JS via opacity + translateY) */
+.banner-content { transition: opacity 0.1s linear; }
+
+/* Reveal générique avec variants */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s cubic-bezier(0.2,0.7,0.2,1), transform 0.9s cubic-bezier(0.2,0.7,0.2,1), filter 0.9s ease; filter: blur(6px); }
+.reveal.visible { opacity: 1; transform: translateY(0); filter: blur(0); }
+
+.reveal-left { opacity: 0; transform: translateX(-50px); transition: opacity 0.9s cubic-bezier(0.2,0.7,0.2,1), transform 0.9s cubic-bezier(0.2,0.7,0.2,1); }
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+.reveal-right { opacity: 0; transform: translateX(50px); transition: opacity 0.9s cubic-bezier(0.2,0.7,0.2,1), transform 0.9s cubic-bezier(0.2,0.7,0.2,1); }
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+.reveal-scale { opacity: 0; transform: scale(0.85); transition: opacity 0.9s cubic-bezier(0.2,0.7,0.2,1), transform 0.9s cubic-bezier(0.2,0.7,0.2,1); }
+.reveal-scale.visible { opacity: 1; transform: scale(1); }
+
+/* Stagger pour grilles */
+.stagger > .reveal,
+.stagger > .reveal-scale,
+.stagger > .reveal-left,
+.stagger > .reveal-right { transition-delay: 0s; }
+.stagger.visible > *:nth-child(1) { transition-delay: 0.05s; }
+.stagger.visible > *:nth-child(2) { transition-delay: 0.2s; }
+.stagger.visible > *:nth-child(3) { transition-delay: 0.35s; }
+.stagger.visible > *:nth-child(4) { transition-delay: 0.5s; }
+
+/* Souligné animé sous les h2 */
+@keyframes underlineGrow { from { width: 0; } to { width: 60px; } }
+h2.section-title { position: relative; }
+h2.section-title::after {
+    content: ''; position: absolute; bottom: -14px; left: 50%;
+    width: 0; height: 2px; background: var(--accent); transform: translateX(-50%);
+}
+h2.section-title.visible::after { animation: underlineGrow 0.8s cubic-bezier(0.2,0.7,0.2,1) 0.3s forwards; }
+
+/* Service-icon hover : rotation + pulse */
+.service-card:hover .service-icon { transform: rotate(-8deg) scale(1.08); background: var(--accent); }
+.service-icon { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.4s ease; }
+
+/* Value-icon flottant */
+@keyframes floatIcon {
+    0%, 100% { transform: translateY(0); }
+    50%     { transform: translateY(-6px); }
+}
+.value-item.visible .value-icon { animation: floatIcon 3.5s ease-in-out infinite; }
+.value-item:nth-child(2).visible .value-icon { animation-delay: -1.2s; }
+.value-item:nth-child(3).visible .value-icon { animation-delay: -2.4s; }
+
+/* Showcase parallax-like zoom */
+.showcase-image img { transition: transform 8s ease-out; transform: scale(1.05); }
+.showcase.visible .showcase-image img { transform: scale(1.15); }
+
+/* Showcase texte slide-in */
+.showcase-content h2 { opacity: 0; transform: translateY(30px); transition: opacity 1s ease 0.3s, transform 1s cubic-bezier(0.2,0.7,0.2,1) 0.3s; }
+.showcase.visible .showcase-content h2 { opacity: 1; transform: translateY(0); }
+
+/* FAQ : reveal slide-up uniforme (géré par .reveal) */
+
+/* Contact items pop-in */
+.contact-info-item { transition: transform 0.3s ease; }
+.contact-info-item:hover { transform: translateY(-3px) scale(1.02); }
+.contact-info-item:hover svg { color: var(--accent); }
+.contact-info-item svg { transition: color 0.3s ease; }
+
+/* Header logo subtle bounce on load */
+@keyframes logoIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.header-logo img { animation: logoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards; }
+.burger { animation: logoIn 1s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards; }
+
+/* Footer reveal */
+.footer-brand, .footer-links, .footer-contact { opacity: 0; transform: translateY(20px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.footer.visible .footer-brand { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+.footer.visible .footer-links { opacity: 1; transform: translateY(0); transition-delay: 0.25s; }
+.footer.visible .footer-contact { opacity: 1; transform: translateY(0); transition-delay: 0.4s; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 900px) {
+    .services-grid { grid-template-columns: 1fr; gap: 20px; }
+    .about-values { grid-template-columns: 1fr; gap: 24px; }
+    .about-photo { aspect-ratio: 4 / 3; border-radius: 12px; }
+    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+}
+
+@media (max-width: 768px) {
+    .header { padding: 10px 20px; }
+    .header-logo img { height: 40px; }
+    .menu-dropdown { top: 60px; left: 20px; min-width: 200px; }
+    .banner-content h1 { font-size: 1.8rem; }
+    .banner-content .hero-subtitle { font-size: 0.95rem; }
+    .services { padding: 60px 0; }
+    .services h2, .about h2, .contact h2, .faq h2 { font-size: 1.7rem; }
+    .showcase { height: 40vh; min-height: 250px; }
+    .showcase-content h2 { font-size: 1.5rem; }
+    .about, .contact, .faq { padding: 70px 0; }
+    .about-text p { text-align: left; font-size: 0.95rem; }
+    .faq-question { font-size: 0.92rem; padding: 16px 18px; }
+    .footer { padding: 40px 0 24px; }
+}
+
+@media (max-width: 480px) {
+    .banner-content h1 { font-size: 1.4rem; }
+}
+    </style>
 </head>
 <body>
 
@@ -30,29 +545,33 @@
             <span></span>
         </button>
         <div class="header-logo">
-            <img src="images/logo.jpg" alt="Conciergerie Mesange">
+            <img src="images/logo.jpg?v=2" alt="Conciergerie Mesange">
         </div>
     </header>
 
-    <!-- BANNER IMAGE -->
+    <!-- BANNER IMAGE (fixé) -->
     <div class="banner" id="hero">
         <img src="images/image_1.jpg" alt="Chambre elegante preparee pour les voyageurs">
+        <div class="banner-veil" id="bannerVeil"></div>
         <div class="banner-content">
             <h1>"Confiez votre bien,<br>nous nous occupons de tout"</h1>
             <p class="hero-subtitle">Votre conciergerie Airbnb de confiance a Angers</p>
         </div>
     </div>
 
+    <!-- Espace de scroll : pilote l'animation du voile -->
+    <div class="banner-spacer"></div>
+
     <!-- SERVICES -->
     <section class="services" id="services">
         <div class="container">
-            <h2>Nos Services</h2>
-            <p class="section-subtitle">Une solution cle en main pour gerer votre bien sereinement</p>
-            <div class="services-grid">
+            <h2 class="section-title">Nos Services</h2>
+            <p class="section-subtitle">Une solution clé en main pour gérer votre bien sereinement</p>
+            <div class="services-grid stagger">
 
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 2L2 7l10 5 10-5-10-5z"/>
                             <path d="M2 17l10 5 10-5"/>
                             <path d="M2 12l10 5 10-5"/>
@@ -60,44 +579,41 @@
                     </div>
                     <h3>Optimisation et valorisation de votre annonce</h3>
                     <ul>
-                        <li>Creation / amelioration de votre annonce</li>
+                        <li>Création / amélioration de votre annonce</li>
                         <li>Photographie professionnelle</li>
                         <li>Optimisation tarifaire dynamique</li>
                     </ul>
                 </div>
 
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                             <line x1="16" y1="2" x2="16" y2="6"/>
                             <line x1="8" y1="2" x2="8" y2="6"/>
                             <line x1="3" y1="10" x2="21" y2="10"/>
-                            <path d="M8 14h.01"/>
-                            <path d="M12 14h.01"/>
-                            <path d="M16 14h.01"/>
-                            <path d="M8 18h.01"/>
-                            <path d="M12 18h.01"/>
+                            <path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/>
+                            <path d="M8 18h.01"/><path d="M12 18h.01"/>
                         </svg>
                     </div>
                     <h3>Gestion locative</h3>
                     <ul>
-                        <li>Gestion des reservations</li>
+                        <li>Gestion des réservations</li>
                         <li>Communication voyageurs 7j/7</li>
                         <li>Check-in / Check-out flexible</li>
-                        <li>Accueil personnalise des voyageurs</li>
+                        <li>Accueil personnalisé des voyageurs</li>
                     </ul>
                 </div>
 
-                <div class="service-card">
+                <div class="service-card reveal">
                     <div class="service-icon">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1"/>
                         </svg>
                     </div>
-                    <h3>Menage et Entretien</h3>
+                    <h3>Ménage et Entretien</h3>
                     <ul>
-                        <li>Menage professionnel entre chaque sejour</li>
+                        <li>Ménage professionnel entre chaque séjour</li>
                         <li>Recharge des produits d'accueil</li>
                         <li>Gestion du linge</li>
                         <li>Petite maintenance</li>
@@ -122,24 +638,24 @@
     <!-- QUI SOMMES-NOUS -->
     <section class="about" id="about">
         <div class="container">
-            <h2>Qui sommes-nous ?</h2>
+            <h2 class="section-title">Qui sommes-nous ?</h2>
             <div class="about-content">
-                <div class="about-text">
-                    <p>Nous sommes une jeune conciergerie locale, implantee a Angers et presente dans ses alentours. Passionnes par notre region et animes par le gout de l'hospitalite, nous mettons tout en oeuvre pour offrir aux voyageurs une experience fluide, agreable et sans stress.</p>
-                    <p>Amoureux du voyage nous-memes, nous comprenons l'importance de se sentir bien accueilli lorsqu'on arrive dans un nouveau lieu. C'est pourquoi nous accordons une attention particuliere a chaque detail : de la qualite de l'accueil a la preparation des logements, en passant par la disponibilite et la reactivite tout au long du sejour.</p>
-                    <p>Notre mission est simple : valoriser les biens de nos proprietaires partenaires tout en offrant aux voyageurs un sejour confortable, chaleureux et memorable sur Angers et ses environs.</p>
+                <div class="about-text reveal">
+                    <p>Nous sommes une jeune conciergerie locale, implantée à Angers et présente dans ses alentours. Passionnés par notre région et animés par le goût de l'hospitalité, nous mettons tout en œuvre pour offrir aux voyageurs une expérience fluide, agréable et sans stress.</p>
+                    <p>Amoureux du voyage nous-mêmes, nous comprenons l'importance de se sentir bien accueilli lorsqu'on arrive dans un nouveau lieu. C'est pourquoi nous accordons une attention particulière à chaque détail : de la qualité de l'accueil à la préparation des logements, en passant par la disponibilité et la réactivité tout au long du séjour.</p>
+                    <p>Notre mission est simple : valoriser les biens de nos propriétaires partenaires tout en offrant aux voyageurs un séjour confortable, chaleureux et mémorable sur Angers et ses environs.</p>
                 </div>
-                <div class="about-values">
-                    <div class="value-item">
+                <div class="about-values stagger">
+                    <div class="value-item reveal-scale">
                         <div class="value-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
                             </svg>
                         </div>
                         <h4>Passion</h4>
-                        <p>L'hospitalite au coeur de chaque detail</p>
+                        <p>L'hospitalité au cœur de chaque détail</p>
                     </div>
-                    <div class="value-item">
+                    <div class="value-item reveal-scale">
                         <div class="value-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -148,7 +664,7 @@
                         <h4>Confiance</h4>
                         <p>Un accompagnement transparent et fiable</p>
                     </div>
-                    <div class="value-item">
+                    <div class="value-item reveal-scale">
                         <div class="value-icon">
                             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="12" cy="12" r="10"/>
@@ -156,9 +672,13 @@
                                 <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
                             </svg>
                         </div>
-                        <h4>Proximite</h4>
-                        <p>Ancres localement a Angers et en Anjou</p>
+                        <h4>Proximité</h4>
+                        <p>Ancrés localement à Angers et en Anjou</p>
                     </div>
+                </div>
+
+                <div class="about-photo reveal">
+                    <img src="images/qui sommes nous.jpg" alt="L'équipe de la Conciergerie Mésange" loading="lazy">
                 </div>
             </div>
         </div>
@@ -167,23 +687,23 @@
     <!-- CONTACT -->
     <section class="contact" id="contact">
         <div class="container">
-            <h2>Contactez-nous</h2>
-            <p class="section-subtitle">Pret a confier votre propriete ? Discutons de votre projet</p>
-            <div class="contact-info-centered">
-                <div class="contact-info-item">
+            <h2 class="section-title">Contactez-nous</h2>
+            <p class="section-subtitle">Prêt à confier votre propriété ? Discutons de votre projet</p>
+            <div class="contact-info-centered stagger">
+                <div class="contact-info-item reveal">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/>
                     </svg>
                     <span>07 88 10 98 16</span>
                 </div>
-                <div class="contact-info-item">
+                <div class="contact-info-item reveal">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                         <polyline points="22,6 12,13 2,6"/>
                     </svg>
                     <span>conciergeriemesange@gmail.com</span>
                 </div>
-                <div class="contact-info-item">
+                <div class="contact-info-item reveal">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
                         <circle cx="12" cy="10" r="3"/>
@@ -197,72 +717,60 @@
     <!-- FAQ -->
     <section class="faq" id="faq">
         <div class="container">
-            <h2>Questions frequentes</h2>
+            <h2 class="section-title">Questions fréquentes</h2>
             <div class="faq-list">
-                <div class="faq-item">
+                <div class="faq-item reveal">
                     <button class="faq-question" aria-expanded="false">
-                        <span>Quels types de biens gerez-vous ?</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
+                        <span>Quels types de biens gérez-vous ?</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <p>Nous gerons tous types de biens : appartements, maisons, studios et logements atypiques situes a Angers et dans ses environs. Que votre bien soit en centre-ville, dans le quartier de la Doutre ou en peripherie, nous adaptons notre service a chaque situation.</p>
+                        <p>Nous gérons tous types de biens : appartements, maisons, studios et logements atypiques situés à Angers et dans ses environs. Que votre bien soit en centre-ville, dans le quartier de la Doutre ou en périphérie, nous adaptons notre service à chaque situation.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item reveal">
                     <button class="faq-question" aria-expanded="false">
-                        <span>Combien coutent vos services ?</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
+                        <span>Combien coûtent vos services ?</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <p>Nous proposons une tarification simple et transparente, basee sur un pourcentage des revenus generes. Contactez-nous pour obtenir une estimation gratuite et personnalisee adaptee a votre bien.</p>
+                        <p>Nous proposons une tarification simple et transparente, basée sur un pourcentage des revenus générés. Contactez-nous pour obtenir une estimation gratuite et personnalisée adaptée à votre bien.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item reveal">
                     <button class="faq-question" aria-expanded="false">
-                        <span>Dois-je etre present pour les arrivees et departs ?</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
+                        <span>Dois-je être présent pour les arrivées et départs ?</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <p>Non, nous prenons en charge l'integralite des check-in et check-out. Vous n'avez rien a faire : nous accueillons vos voyageurs et gerons les remises de cles de maniere professionnelle.</p>
+                        <p>Non, nous prenons en charge l'intégralité des check-in et check-out. Vous n'avez rien à faire : nous accueillons vos voyageurs et gérons les remises de clés de manière professionnelle.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item reveal">
                     <button class="faq-question" aria-expanded="false">
                         <span>Comment suivre les performances de mon bien ?</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <p>Nous vous fournissons des comptes rendus reguliers avec le detail des reservations, des revenus et des avis voyageurs. Vous restez informe en toute transparence.</p>
+                        <p>Nous vous fournissons des comptes rendus réguliers avec le détail des réservations, des revenus et des avis voyageurs. Vous restez informé en toute transparence.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item reveal">
                     <button class="faq-question" aria-expanded="false">
                         <span>Sur quelles plateformes diffusez-vous mon annonce ?</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <p>Nous diffusons votre annonce sur les principales plateformes de location courte duree : Airbnb, Booking.com et d'autres canaux pertinents pour maximiser votre visibilite et votre taux d'occupation.</p>
+                        <p>Nous diffusons votre annonce sur les principales plateformes de location courte durée : Airbnb, Booking.com et d'autres canaux pertinents pour maximiser votre visibilité et votre taux d'occupation.</p>
                     </div>
                 </div>
-                <div class="faq-item">
+                <div class="faq-item reveal">
                     <button class="faq-question" aria-expanded="false">
-                        <span>Que se passe-t-il en cas de probleme pendant un sejour ?</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"/>
-                        </svg>
+                        <span>Que se passe-t-il en cas de problème pendant un séjour ?</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
                     <div class="faq-answer">
-                        <p>Nous sommes joignables 7j/7 et intervenons rapidement en cas d'imprevus. Que ce soit un souci technique ou une question d'un voyageur, nous gerons la situation pour vous.</p>
+                        <p>Nous sommes joignables 7j/7 et intervenons rapidement en cas d'imprévus. Que ce soit un souci technique ou une question d'un voyageur, nous gérons la situation pour vous.</p>
                     </div>
                 </div>
             </div>
@@ -274,8 +782,8 @@
         <div class="container">
             <div class="footer-top">
                 <div class="footer-brand">
-                    <img src="images/logo.jpg" alt="Conciergerie Mesange" class="footer-logo">
-                    <p>Votre conciergerie Airbnb de confiance a Angers</p>
+                    <img src="images/logo.jpg?v=2" alt="Conciergerie Mesange" class="footer-logo">
+                    <p>Votre conciergerie Airbnb de confiance à Angers</p>
                 </div>
                 <div class="footer-links">
                     <h4>Navigation</h4>
@@ -292,11 +800,95 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>Conciergerie Mesange - Tous droits reserves</p>
+                <p>Conciergerie Mésange — Tous droits réservés</p>
             </div>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    var burger = document.getElementById('burgerBtn');
+    var dropdown = document.getElementById('menuDropdown');
+
+    function closeMenu() {
+        burger.classList.remove('active');
+        dropdown.classList.remove('open');
+    }
+
+    burger.addEventListener('click', function () {
+        burger.classList.toggle('active');
+        dropdown.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+        if (!dropdown.contains(e.target) && !burger.contains(e.target)) closeMenu();
+    });
+
+    dropdown.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', closeMenu);
+    });
+
+    var header = document.getElementById('header');
+    var bannerVeil = document.getElementById('bannerVeil');
+
+    window.addEventListener('scroll', function () {
+        var scrollY = window.scrollY;
+        var vh = window.innerHeight;
+
+        // Header
+        if (scrollY > 50) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
+
+        // Voile : 20% au repos (visible haut) → -17% (couverture 100% solide)
+        // Mappé sur 100vh de scroll (durée du banner-spacer)
+        var progress = Math.min(scrollY / vh, 1);
+        var eased = 1 - Math.pow(1 - progress, 2);
+        var ty = 20 - (eased * 37);
+        // Hero text exit au scroll : fade + léger déplacement vers le haut
+        var contentEl = document.querySelector('.banner-content');
+        if (contentEl) {
+            var heroFade = Math.max(0, 1 - scrollY / (vh * 0.45));
+            var heroShift = Math.min(scrollY * 0.35, vh * 0.3);
+            contentEl.style.opacity = heroFade.toFixed(3);
+            contentEl.style.transform = 'translate(-50%, calc(-50% - ' + heroShift.toFixed(0) + 'px))';
+        }
+        bannerVeil.style.transform = 'translateY(' + ty.toFixed(2) + '%)';
+    }, { passive: true });
+
+    // FAQ
+    var faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(function (item) {
+        item.querySelector('.faq-question').addEventListener('click', function () {
+            var isActive = item.classList.contains('active');
+            faqItems.forEach(function (i) { i.classList.remove('active'); });
+            if (!isActive) item.classList.add('active');
+        });
+    });
+
+    // Reveal scroll : multi-classes
+    var revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .stagger, h2.section-title, .showcase, .footer');
+    var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    revealEls.forEach(function (el) { observer.observe(el); });
+
+    // Force visible sur les enfants des stagger déjà vus
+    var staggerObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+                entry.target.querySelectorAll('.reveal, .reveal-scale, .reveal-left, .reveal-right').forEach(function (c) { c.classList.add('visible'); });
+                staggerObs.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.stagger').forEach(function (el) { staggerObs.observe(el); });
+});
+    </script>
 </body>
 </html>
